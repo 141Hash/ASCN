@@ -1,7 +1,7 @@
 - name: Reset Cluster
   command: kubeadm reset --force
 
-- name: Cleanup before adm init
+- name: Cleanup
   shell: |
           systemctl stop kubelet
           systemctl stop docker
