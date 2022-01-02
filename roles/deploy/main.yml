@@ -1,0 +1,8 @@
+- name: Create PV and PVC for Postgres
+  command: kubectl apply -f postgres-pv.yaml
+
+- name: Create Postgres deployment
+  command: kubectl apply -f postgres-deployment.yaml
+
+- name: Create Wiki deployment
+  command: kubectl apply -f wiki-deployment.yaml

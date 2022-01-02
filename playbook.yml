@@ -1,0 +1,24 @@
+---
+- name: Install Wiki.js
+  hosts: vms
+  become: true
+  roles:
+    - common
+
+- name: Kubernetes Master
+  hosts: master
+  become: true
+  roles:
+    - master
+
+- name: Join Kubernetes Nodes
+  hosts: nodes
+  become: true
+  roles:
+    - nodes
+
+- name: Deploy Kubernetes
+  hosts: master
+  become: no
+  roles:
+    - deploy
