@@ -37,12 +37,12 @@ spec:
           value: wiki
         ports:
         - containerPort: 5432
-          name: psotgres
+          name: postgres
         volumeMounts:
         - name: postgres-persistent-storage
           mountPath: /var/lib/postgres
       volumes:
       - name: postgres-persistent-storage
         persistentVolumeClaim:
-          claimName: psotgres-pv-claim
+          claimName: postgres-pv-claim
 

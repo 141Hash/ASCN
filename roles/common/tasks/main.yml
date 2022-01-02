@@ -26,6 +26,7 @@
     - software-properties-common
     - containerd.io
     - ufw
+    - net-tools
 
 - name: Install Docker
   apt:
@@ -94,4 +95,5 @@
     state: enabled
     policy: allow
  
+
 
