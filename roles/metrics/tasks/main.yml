@@ -1,0 +1,11 @@
+- name: Download and unpack Metricbeat
+  get_url: 
+    url: https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    mode: '0440'
+
+- name: Unzip Metricbeat
+  ansible.builtin.unarchive:
+    src: metricbeat-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    remote_src: yes

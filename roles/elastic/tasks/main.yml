@@ -1,1 +1,57 @@
-- name: 
+- name: Download and unpack ElasticSearch
+  get_url: 
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    mode: '0440'
+
+- name: Unzip ElasticSearch
+  ansible.builtin.unarchive:
+    src: elasticsearch-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    remote_src: yes
+
+- name: Configure ElasticSearch Network
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: 'network.host:.+\n'
+    replace: 'network.host: "{{host_ip}}"\n'
+
+- name: Configure ElasticSearch seed_hosts
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: 'discovery.seed_hosts:.+\n'
+    replace: 'discovery.seed_hosts: []\n'
+
+- name: Configure ElasticSearch inital_master_nodes
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: 'cluster.initial_master_nodes:.+\n'
+    replace: 'cluster.initial_master_nodes: [""{{host_ip}}""]\n'
+
+- name: Increase VM Map
+  command: sysctl -w vm.max_map_count=262144
+
+- name: Download and unpack Kibana
+  get_url: 
+    url: https://artifacts.elastic.co/downloads/kibana/kibana-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    mode: '0440'
+
+- name: Unzip Kibana
+  ansible.builtin.unarchive:
+    src: kibana-7.16.2-linux-x86_64.tar.gz
+    dest: ./
+    remote_src: yes
+
+- name: Configure Kibana server.host
+  ansible.builtin.replace:
+    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
+    regexp: 'server.host: .+\n'
+    replace: 'server.host: "{{host_ip}}"\n'
+
+- name: Configure Kibana elasticsearch.hosts
+  ansible.builtin.replace:
+    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
+    regexp: 'elasticsearch.hosts:.+\n'
+    replace: 'elasticsearch.hosts: ["http://"{{host_ip}}":9200"]\n'
+
