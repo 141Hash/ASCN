@@ -55,3 +55,10 @@
     regexp: 'elasticsearch.hosts:.+\n'
     replace: 'elasticsearch.hosts: ["http://"{{host_ip}}":9200"]\n'
 
+- name: Install Java using Ansible
+  apt:
+      name: "{{ packages }}"
+      state: present
+  vars:
+       packages:
+          - openjdk-11-jdk

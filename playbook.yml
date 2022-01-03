@@ -1,36 +1,36 @@
 ---
-# - name: Install Wiki.js
-#   hosts: vms
-#   become: true
-#   roles:
-#     - common
+  # - name: Install Wiki.js
+  #   hosts: vms
+  #   become: true
+  #   roles:
+  #     - common
 
-# - name: Kubernetes Master
-#   hosts: master
-#   become: true
-#   roles:
-#     - master
+  # - name: Kubernetes Master
+  #   hosts: master
+  #   become: true
+  #   roles:
+  #     - master
 
-# - name: Join Kubernetes Nodes
-#   hosts: nodes
-#   become: true
-#   roles:
-#     - nodes
+  # - name: Join Kubernetes Nodes
+  #   hosts: nodes
+  #   become: true
+  #   roles:
+  #     - nodes
 
-# - name: Deploy Kubernetes
-#   hosts: master
-#   become: no
-#   roles:
-#     - deploy
+  # - name: Deploy Kubernetes
+  #   hosts: master
+  #   become: no
+  #   roles:
+  #     - deploy
 
-# - name: Install Elastic Search and Kibana
-#   hosts: master
-#   become: yes
-#   roles:
-#     - elastic
+   - name: Install Elastic Search and Kibana
+     hosts: master
+     become: yes
+     roles:
+      - elastic
 
-- name: Install Metricbeats
-  hosts: nodes
-  become: yes
-  roles:
-    - metrics
+   - name: Install Metricbeats
+     hosts: nodes
+     become: yes
+     roles:
+      - metrics

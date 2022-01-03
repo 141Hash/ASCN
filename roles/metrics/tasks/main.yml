@@ -9,3 +9,15 @@
     src: metricbeat-7.16.2-linux-x86_64.tar.gz
     dest: ./
     remote_src: yes
+
+- name: Configure Kibana host
+  ansible.builtin.replace:
+    path: metricbeat-7.16.2-linux-x86_64/metricbeat.yml
+    regexp: '#host:.+\n'
+    replace: 'host: "{{host_ip}}"\n'
+
+- name: Configure ElasticSearch host
+  ansible.builtin.replace:
+    path: metricbeat-7.16.2-linux-x86_64/metricbeat.yml
+    regexp: 'hosts:.+\n'
+    replace: 'hosts: "{{host_ip}}"\n'

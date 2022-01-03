@@ -1,0 +1,8 @@
+- name: Make two more replicas
+  ansible.builtin.replace:
+    path: wiki-deployment.yaml
+    regexp: 'replicas:.+\n'
+    replace: 'replicas: 2\n'
+
+- name: Create Wiki deployment
+  command: kubectl apply -f wiki-deployment.yaml
