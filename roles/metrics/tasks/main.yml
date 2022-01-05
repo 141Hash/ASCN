@@ -27,7 +27,6 @@
     chdir: "metricbeat-7.16.2-linux-x86_64"
 
 - name: Run Metricbeat
-  become: yes
-  shell: cd /tmp/www; nohup  bash metricbeat -e </dev/null >/dev/null 2>&1 &
+  shell: ./metricbeat -e
   args:
-    chdir: "metricbeat-7.16.2-linux-x86_64/"
+    chdir: "metricbeat-7.16.2-linux-x86_64"
