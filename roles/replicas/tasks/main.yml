@@ -2,7 +2,7 @@
   ansible.builtin.replace:
     path: wiki-deployment.yaml
     regexp: 'replicas:.+\n'
-    replace: 'replicas: 2\n'
+    replace: 'replicas: 3\n'
 
 - name: Create Wiki deployment
   command: kubectl apply -f wiki-deployment.yaml

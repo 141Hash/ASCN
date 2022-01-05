@@ -1,64 +1,86 @@
-- name: Download and unpack ElasticSearch
-  get_url: 
-    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.16.2-linux-x86_64.tar.gz
-    dest: ./
-    mode: '0440'
-
-- name: Unzip ElasticSearch
-  ansible.builtin.unarchive:
-    src: elasticsearch-7.16.2-linux-x86_64.tar.gz
-    dest: ./
-    remote_src: yes
-
-- name: Configure ElasticSearch Network
-  ansible.builtin.replace:
-    path: elasticsearch-7.16.2/config/elasticsearch.yml
-    regexp: 'network.host:.+\n'
-    replace: 'network.host: "{{host_ip}}"\n'
-
-- name: Configure ElasticSearch seed_hosts
-  ansible.builtin.replace:
-    path: elasticsearch-7.16.2/config/elasticsearch.yml
-    regexp: 'discovery.seed_hosts:.+\n'
-    replace: 'discovery.seed_hosts: []\n'
-
-- name: Configure ElasticSearch inital_master_nodes
-  ansible.builtin.replace:
-    path: elasticsearch-7.16.2/config/elasticsearch.yml
-    regexp: 'cluster.initial_master_nodes:.+\n'
-    replace: 'cluster.initial_master_nodes: [""{{host_ip}}""]\n'
-
-- name: Increase VM Map
-  command: sysctl -w vm.max_map_count=262144
-
-- name: Download and unpack Kibana
-  get_url: 
-    url: https://artifacts.elastic.co/downloads/kibana/kibana-7.16.2-linux-x86_64.tar.gz
-    dest: ./
-    mode: '0440'
-
-- name: Unzip Kibana
-  ansible.builtin.unarchive:
-    src: kibana-7.16.2-linux-x86_64.tar.gz
-    dest: ./
-    remote_src: yes
-
-- name: Configure Kibana server.host
-  ansible.builtin.replace:
-    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
-    regexp: 'server.host: .+\n'
-    replace: 'server.host: "{{host_ip}}"\n'
-
-- name: Configure Kibana elasticsearch.hosts
-  ansible.builtin.replace:
-    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
-    regexp: 'elasticsearch.hosts:.+\n'
-    replace: 'elasticsearch.hosts: ["http://"{{host_ip}}":9200"]\n'
-
 - name: Install Java using Ansible
+  become: yes
   apt:
       name: "{{ packages }}"
       state: present
   vars:
        packages:
           - openjdk-11-jdk
+
+- name: Edit JAVA_HOME to ElasticSearch
+  become: yes
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    regexp: '^JAVA_HOME'
+    line: 'JAVA_HOME=/usr'
+
+- name: Download and unpack ElasticSearch
+  get_url: 
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.16.2-linux-x86_64.tar.gz
+    dest: "./elasticSearch"
+
+- name: Unzip ElasticSearch
+  ansible.builtin.unarchive:
+    src: "elasticSearch"
+    dest: ./
+    remote_src: yes
+
+- name: Configure ElasticSearch Network
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: '#network.host:.+\n'
+    replace: 'network.host: {{host_ip}}\n'
+
+- name: Configure ElasticSearch seed_hosts
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: '#discovery.seed_hosts:.+\n'
+    replace: 'discovery.seed_hosts: []\n'
+
+- name: Configure ElasticSearch inital_master_nodes
+  ansible.builtin.replace:
+    path: elasticsearch-7.16.2/config/elasticsearch.yml
+    regexp: '#cluster.initial_master_nodes:.+\n'
+    replace: 'cluster.initial_master_nodes: ["{{host_ip}}"]\n'
+
+- name: Run Elasticsearch
+  shell: cd /tmp/www; nohup  bash elasticsearch </dev/null >/dev/null 2>&1 &
+  args:
+    chdir: "elasticsearch-7.16.2/bin/"
+
+- name: Increase VM Map
+  become: yes
+  command: sysctl -w vm.max_map_count=262144
+
+- name: Download and unpack Kibana
+  get_url: 
+    url: https://artifacts.elastic.co/downloads/kibana/kibana-7.16.2-linux-x86_64.tar.gz
+    dest: "./kibana"
+
+- name: Unzip Kibana
+  ansible.builtin.unarchive:
+    src: "kibana"
+    dest: ./
+    remote_src: yes
+
+- name: Configure Kibana server.host
+  ansible.builtin.replace:
+    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
+    regexp: '#server.host: .+\n'
+    replace: ' server.host: {{host_ip}}\n'
+
+- name: Configure Kibana elasticsearch.hosts
+  ansible.builtin.replace:
+    path: kibana-7.16.2-linux-x86_64/config/kibana.yml
+    regexp: '#elasticsearch.hosts:.+\n'
+    replace: ' elasticsearch.hosts: ["http://{{host_ip}}:9200"]\n'
+
+- name: Run Kibana
+  become: yes
+  shell: cd /tmp/www; nohup  bash kibana --allow-root </dev/null >/dev/null 2>&1 &
+  args:
+    chdir: "kibana-7.16.2-linux-x86_64/bin/"
+
+- name: Sleep to configure all features
+  command: sleep 60

@@ -1,12 +1,11 @@
 - name: Download and unpack Metricbeat
   get_url: 
     url: https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.16.2-linux-x86_64.tar.gz
-    dest: ./
-    mode: '0440'
+    dest: "./metricbeat"
 
 - name: Unzip Metricbeat
   ansible.builtin.unarchive:
-    src: metricbeat-7.16.2-linux-x86_64.tar.gz
+    src: "metricbeat"
     dest: ./
     remote_src: yes
 
@@ -20,4 +19,15 @@
   ansible.builtin.replace:
     path: metricbeat-7.16.2-linux-x86_64/metricbeat.yml
     regexp: 'hosts:.+\n'
-    replace: 'hosts: "{{host_ip}}"\n'
+    replace: 'hosts: ["{{host_ip}}"]\n'
+
+- name: Install indexes and dashboards
+  shell: ./metricbeat setup
+  args:
+    chdir: "metricbeat-7.16.2-linux-x86_64"
+
+- name: Run Metricbeat
+  become: yes
+  shell: cd /tmp/www; nohup  bash metricbeat -e </dev/null >/dev/null 2>&1 &
+  args:
+    chdir: "metricbeat-7.16.2-linux-x86_64/"
